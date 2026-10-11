@@ -1,0 +1,30 @@
+{
+  "name": "@pokecard/api",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc-watch -p tsconfig.json --onSuccess \"node --env-file=.env dist/src/main.js\"",
+    "start": "node dist/src/main.js",
+    "db:validate": "prisma validate",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:push:test": "prisma db push",
+    "test:integration": "node --test dist/test/database.test.js"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.1.6",
+    "@nestjs/core": "^11.1.6",
+    "@nestjs/platform-express": "^11.1.6",
+    "@pokecard/shared": "0.1.0",
+    "@prisma/client": "6.19.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "prisma": "6.19.0",
+    "typescript": "^5.8.3",
+    "tsc-watch": "^6.2.1"
+  }
+}

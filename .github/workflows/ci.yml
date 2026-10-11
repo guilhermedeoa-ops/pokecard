@@ -1,0 +1,38 @@
+name: Foundation checks
+on:
+  pull_request:
+  push:
+    branches: [main, codex/initial-foundation]
+permissions:
+  contents: read
+jobs:
+  foundation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: pokecard
+          POSTGRES_PASSWORD: test-only
+          POSTGRES_DB: pokecard_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U pokecard -d pokecard_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://pokecard:test-only@localhost:5432/pokecard_test?schema=public
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm install
+      - run: npm run db:validate
+      - run: npm run db:generate
+      - run: npm run db:push:test -w @pokecard/api
+      - run: npm run build
+      - run: npm run test:integration
