@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+enum AccountTokenPurpose {
+  VERIFY_EMAIL
+  RESET_PASSWORD
+}
+model User {
+  id              String         @id @default(uuid()) @db.Uuid
+  username        String         @db.VarChar(32)
+  usernameKey     String         @unique @db.VarChar(32)
+  email           String         @db.VarChar(254)
+  emailKey        String         @unique @db.VarChar(254)
+  passwordHash    String         @db.VarChar(255)
+  emailVerifiedAt DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  trainer         Trainer?
+  sessions        Session[]
+  tokens          AccountToken[]
+}
+model Trainer {
+  id            String   @id @default(uuid()) @db.Uuid
+  userId        String   @unique @db.Uuid
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  displayName   String   @db.VarChar(32)
+  avatarUrl     String?
+  level         Int      @default(1)
+  experience    Int      @default(0)
+  onboardingAt  DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+model Session {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @db.Uuid
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash   String   @unique @db.VarChar(64)
+  expiresAt   DateTime
+  revokedAt   DateTime?
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+model AccountToken {
+  id         String              @id @default(uuid()) @db.Uuid
+  userId     String              @db.Uuid
+  user       User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  purpose    AccountTokenPurpose
+  tokenHash  String              @unique @db.VarChar(64)
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime            @default(now())
+
+  @@index([userId, purpose])
+  @@index([expiresAt])
+}
+
+model EmailDelivery {
+  id            String   @id @default(uuid()) @db.Uuid
+  payload       String
+  attempts      Int      @default(0)
+  nextAttemptAt DateTime @default(now())
+  leaseUntil    DateTime?
+  sentAt        DateTime?
+  createdAt     DateTime @default(now())
+
+  @@index([sentAt, nextAttemptAt])
+}
