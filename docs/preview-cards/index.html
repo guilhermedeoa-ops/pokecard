@@ -32,7 +32,7 @@ const species={"4":{name:"Charmander",type:"Fogo",emoji:"🔥",style:"",ability:
 const section=document.createElement('section');section.className='stage6';section.innerHTML='<h3>Etapa 06 · Simulador de atributos</h3><p class="muted">Comparativo demonstrativo para testar IV, EV e natureza. Não altera as regras definitivas do jogo.</p><div class="stage6-grid"><div>IV total<strong id="stage6iv">—</strong></div><div>EV total<strong id="stage6ev">—</strong></div><div>EV disponível<strong id="stage6remaining">—</strong></div></div><p class="muted">Limites de teste: IV 0–31 por atributo; EV 0–252 por atributo e 510 no total. Natureza influencia a simulação, sem definir a fórmula final do projeto.</p>';
 const target=document.querySelector('.panel')||document.querySelector('main');target.appendChild(section);
 function refresh(){let iv=0,ev=0;document.querySelectorAll('[data-iv]').forEach(x=>iv+=Math.max(0,Math.min(31,Number(x.value)||0)));document.querySelectorAll('[data-ev]').forEach(x=>ev+=Math.max(0,Math.min(252,Number(x.value)||0)));document.getElementById('stage6iv').textContent=iv+' / 186';document.getElementById('stage6ev').textContent=ev+' / 510';document.getElementById('stage6remaining').textContent=Math.max(0,510-ev)}
-document.addEventListener('change',()=>setTimeout(refresh,0));const observer=new MutationObserver(()=>{if(!document.querySelector('[data-iv]')&&!document.querySelector('[data-ev]'))return;refresh()});observer.observe(document.querySelector('main')||document.body,{childList:true,subtree:true});refresh();
+document.addEventListener('change',()=>setTimeout(refresh,0));const observer=new MutationObserver(mutations=>{if(!mutations.some(m=>m.addedNodes.length&&Array.from(m.addedNodes).some(n=>n.nodeType===1&&!(n.closest&&n.closest('.stage6')))))return;if(!document.querySelector('[data-iv]')&&!document.querySelector('[data-ev]'))return;refresh()});observer.observe(document.querySelector('main')||document.body,{childList:true,subtree:true});refresh();
 })();
 </script><script>
 (function(){
@@ -45,5 +45,31 @@ level=s.level;origin=s.origin;ivStats=s.ivs.slice();evStats=s.evs.slice();equipm
 document.getElementById('origin').value=origin;tab='Status';draw();
 banner.querySelector('[data-feedback]').textContent='Cenário aplicado.';
 });
+})();
+</script><style>
+.stage8{margin:18px 0;padding:16px;border:1px solid #5d799d;border-radius:14px;background:#14233b}
+.stage8 h3{margin:0 0 8px}.stage8 button{margin:8px 8px 0 0}.stage8-result{margin-top:10px;white-space:pre-wrap;font-size:12px;color:#cfe4f9}
+</style>
+<script>
+(function(){
+const box=document.createElement('aside');box.className='stage8';box.innerHTML='<h3>Etapa 08 · Auditoria do modelo</h3><p class="muted">Verifica as regras estruturais da simulação, sem gravar ou modificar a carta.</p><button id="stage8test" type="button">Executar verificações</button><div class="stage8-result" id="stage8result" role="status">Pronto para verificar.</div>';
+const anchor=document.querySelector('.stage7-banner');if(anchor)anchor.after(box);else document.querySelector('main')?.before(box);
+document.getElementById('stage8test').onclick=()=>{
+const tests=[
+['Seis atributos IV',ivStats.length===6],
+['IV entre 0 e 31',ivStats.every(v=>Number.isInteger(v)&&v>=0&&v<=31)],
+['Seis atributos EV',evStats.length===6],
+['EV entre 0 e 252',evStats.every(v=>Number.isInteger(v)&&v>=0&&v<=252)],
+['EV total até 510',evStats.reduce((a,b)=>a+b,0)<=510],
+['Nível entre 1 e 100',Number.isInteger(level)&&level>=1&&level<=100],
+['Origem válida',['STARTER_PACK','POKEMON_PACK','CAUGHT'].includes(origin)],
+['Moldura válida',Object.hasOwn(balls,ball)],
+['Seis abas',tabs.length===6],
+['Equipamento CAUGHT: 0 / 1 / 2', [5,24,25].map(l=>l<10?0:l<25?1:2).join(',')==='0,1,2'],
+['Natureza cadastrada',Object.hasOwn(natures,nature)]
+];
+const failures=tests.filter(x=>!x[1]);
+document.getElementById('stage8result').textContent=tests.map(([name,ok])=>(ok?'✓ ':'✕ ')+name).join('\n')+'\n'+(failures.length?'Falhas: '+failures.length:'Todas as '+tests.length+' verificações passaram.');
+};
 })();
 </script></body></html>
