@@ -10,7 +10,8 @@
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:push:test": "prisma db push",
-    "test:integration": "node --test dist/test/database.test.js"
+    "test:integration": "node --test dist/test/*.test.js",
+    "db:deploy": "prisma migrate deploy"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.6",
@@ -19,12 +20,21 @@
     "@pokecard/shared": "0.1.0",
     "@prisma/client": "6.19.0",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.2"
+    "rxjs": "^7.8.2",
+    "@nestjs/throttler": "^6.4.0",
+    "argon2": "^0.44.0",
+    "class-validator": "^0.14.2",
+    "class-transformer": "^0.5.1",
+    "cookie-parser": "^1.4.7",
+    "nodemailer": "^7.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.15.0",
     "prisma": "6.19.0",
     "typescript": "^5.8.3",
-    "tsc-watch": "^6.2.1"
+    "tsc-watch": "^6.2.1",
+    "@types/express": "^5.0.0",
+    "@types/cookie-parser": "^1.4.9",
+    "@types/nodemailer": "^7.0.0"
   }
 }

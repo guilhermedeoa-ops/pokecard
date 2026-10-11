@@ -8,7 +8,7 @@ Monorepo npm com apps/web, apps/api e packages/shared; PostgreSQL local com Dock
 
 Prisma 6.19 é uma escolha inicial explícita para manter o cliente clássico; não se afirma que seja a versão mais recente. Migração de versão terá revisão própria. O primeiro install não tem lockfile: a CI valida as dependências resolvidas, mas builds ainda não são reproduzíveis. Gerar e versionar package-lock.json antes de uma release.
 
-## Cadastro e treinador: próximo incremento
+## Cadastro e treinador: incremento implementado
 - Normalizar usernameKey e emailKey na API; nunca aceitar essas chaves do cliente.
 - Validar DTOs; senhas com Argon2id; não retornar hashes em respostas.
 - Criar conta/treinador atomicamente, ou definir criação do treinador no onboarding.
@@ -16,7 +16,7 @@ Prisma 6.19 é uma escolha inicial explícita para manter o cliente clássico; n
 - Sessão revogável em cookie HttpOnly, Secure em produção e SameSite; proteção de origem/CSRF, limites de tentativas e respostas que não revelem existência de e-mails.
 - Recuperação de senha revoga sessões; e-mail via interface de entrega com outbox transacional.
 - Testes de duplicidade, credenciais, validade e reutilização de tokens, isolamento entre usuários e autorização.
-O esquema desta entrega não implementa autenticação: não há endpoints de cadastro/login nem envio de e-mail.
+Cadastro/login/verificação/recuperação e perfil implementados no incremento de autenticação. Consulte authentication.md para contratos e limitações de implantação.
 
 ## Fronteiras dos próximos módulos
 - Contas e sessões: identidade e autorização.

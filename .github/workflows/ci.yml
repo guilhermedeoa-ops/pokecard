@@ -22,7 +22,13 @@ jobs:
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
+      mailpit:
+        image: axllent/mailpit:v1.27
+        ports: ["1025:1025", "8025:8025"]
     env:
+      MAIL_ENCRYPTION_KEY: "0000000000000000000000000000000000000000000000000000000000000000"
+      SMTP_HOST: localhost
+      SMTP_PORT: "1025"
       DATABASE_URL: postgresql://pokecard:test-only@localhost:5432/pokecard_test?schema=public
       NEXT_TELEMETRY_DISABLED: "1"
     steps:
@@ -33,6 +39,6 @@ jobs:
       - run: npm install
       - run: npm run db:validate
       - run: npm run db:generate
-      - run: npm run db:push:test -w @pokecard/api
+      - run: npm run db:deploy -w @pokecard/api
       - run: npm run build
       - run: npm run test:integration

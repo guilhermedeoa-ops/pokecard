@@ -60,3 +60,15 @@ model AccountToken {
   @@index([userId, purpose])
   @@index([expiresAt])
 }
+
+model EmailDelivery {
+  id            String   @id @default(uuid()) @db.Uuid
+  payload       String
+  attempts      Int      @default(0)
+  nextAttemptAt DateTime @default(now())
+  leaseUntil    DateTime?
+  sentAt        DateTime?
+  createdAt     DateTime @default(now())
+
+  @@index([sentAt, nextAttemptAt])
+}
