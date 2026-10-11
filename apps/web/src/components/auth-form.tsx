@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { api } from "../lib/api";
 
 type Mode = "register" | "login" | "forgot" | "verify" | "reset" | "resend";
@@ -16,11 +16,13 @@ const paths: Record<Mode, string> = {
 
 export function AuthForm({ mode }: { mode: Mode }) {
   const [token, setToken] = useState("");
+  const tokenLoaded = useRef(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   useEffect(() => {
-    if (mode === "verify" || mode === "reset") {
+    if ((mode === "verify" || mode === "reset") && !tokenLoaded.current) {
+      tokenLoaded.current = true;
       const value = new URLSearchParams(window.location.hash.slice(1)).get("token") ?? "";
       setToken(value);
       if (!/^[a-f0-9]{64}$/.test(value)) setError("Link inválido. Solicite um novo e-mail.");
