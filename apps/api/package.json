@@ -11,7 +11,8 @@
     "db:migrate": "prisma migrate dev",
     "db:push:test": "prisma db push",
     "test:integration": "node --test dist/test/*.test.js",
-    "db:deploy": "prisma migrate deploy"
+    "db:deploy": "prisma migrate deploy",
+    "db:seed": "node dist/src/content/seed.js"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.6",

@@ -32,6 +32,17 @@ model Trainer {
   level         Int      @default(1)
   experience    Int      @default(0)
   onboardingAt  DateTime?
+  locationId    String   @default("pallet-town")
+  location      Location @relation(fields: [locationId], references: [id])
+  pokedollars   Int      @default(0)
+  starter       StarterSelection?
+  cards         PokemonInstance[] @relation("Owner")
+  originalCards PokemonInstance[] @relation("OriginalTrainer")
+  dex           PokedexEntry[]
+  inventory     InventoryEntry[]
+  tutorial      TutorialProgress?
+  unlocks       PlayerLocationUnlock[]
+  rewards       RewardGrant[]
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
@@ -71,4 +82,127 @@ model EmailDelivery {
   createdAt     DateTime @default(now())
 
   @@index([sentAt, nextAttemptAt])
+}
+
+enum DexStatus {
+  SEEN
+  CAPTURED
+}
+model Location {
+  id       String @id
+  name     String
+  trainers Trainer[]
+  unlocks  PlayerLocationUnlock[]
+}
+model PokemonSpecies {
+  id               Int @id
+  name             String
+  types            String[]
+  baseStats        Json
+  abilities        String[]
+  moves            String[]
+  imageUrl         String
+  imagePlaceholder Boolean @default(true)
+  cards            PokemonInstance[]
+  packs            PackDefinition[]
+  dex              PokedexEntry[]
+}
+model PackDefinition {
+  id        String @id
+  name      String
+  element   String
+  speciesId Int
+  species   PokemonSpecies @relation(fields: [speciesId], references: [id], onDelete: Restrict)
+  selections StarterSelection[]
+}
+model PokemonInstance {
+  id                String @id @default(uuid()) @db.Uuid
+  speciesId         Int
+  species           PokemonSpecies @relation(fields: [speciesId], references: [id], onDelete: Restrict)
+  ownerId           String @db.Uuid
+  owner             Trainer @relation("Owner", fields: [ownerId], references: [id], onDelete: Restrict)
+  originalTrainerId String @db.Uuid
+  originalTrainer   Trainer @relation("OriginalTrainer", fields: [originalTrainerId], references: [id], onDelete: Restrict)
+  originalTrainerName String
+  level             Int @default(5)
+  experience        Int @default(0)
+  hpCurrent         Int
+  stats             Json
+  abilities         String[]
+  moves             String[]
+  originBall        String @default("POKE_BALL")
+  tier              String @default("COMMON")
+  originLocation    String @default("Pallet Town")
+  originDescription String @default("Pokémon Inicial — Presente do Professor Oak")
+  capturedAt        DateTime @default(now())
+  history           Json
+  starter           StarterSelection?
+
+  @@index([ownerId])
+  @@index([speciesId])
+}
+model StarterSelection {
+  trainerId String @id @db.Uuid
+  trainer   Trainer @relation(fields: [trainerId], references: [id], onDelete: Restrict)
+  packId    String
+  pack      PackDefinition @relation(fields: [packId], references: [id], onDelete: Restrict)
+  cardId    String @unique @db.Uuid
+  card      PokemonInstance @relation(fields: [cardId], references: [id], onDelete: Restrict)
+  chosenAt  DateTime @default(now())
+}
+model PokedexEntry {
+  trainerId String @db.Uuid
+  trainer   Trainer @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  speciesId Int
+  species   PokemonSpecies @relation(fields: [speciesId], references: [id], onDelete: Restrict)
+  status    DexStatus
+  firstSeenAt DateTime @default(now())
+  capturedAt DateTime?
+
+  @@id([trainerId, speciesId])
+}
+model ItemDefinition {
+  id       String @id
+  name     String
+  category String
+  entries  InventoryEntry[]
+}
+model InventoryEntry {
+  trainerId String @db.Uuid
+  trainer   Trainer @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  itemId    String
+  item      ItemDefinition @relation(fields: [itemId], references: [id], onDelete: Restrict)
+  quantity  Int @default(0)
+
+  @@id([trainerId, itemId])
+}
+model TutorialProgress {
+  trainerId       String @id @db.Uuid
+  trainer         Trainer @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  dialogIndex     Int @default(0)
+  oakDone         Boolean @default(false)
+  revealed        Boolean @default(false)
+  detailsViewed   Boolean @default(false)
+  collectionVisited Boolean @default(false)
+  dexVisited      Boolean @default(false)
+  mapVisited      Boolean @default(false)
+  completedAt     DateTime?
+  updatedAt       DateTime @updatedAt
+}
+model PlayerLocationUnlock {
+  trainerId String @db.Uuid
+  trainer   Trainer @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  locationId String
+  location   Location @relation(fields: [locationId], references: [id], onDelete: Restrict)
+  unlockedAt DateTime @default(now())
+
+  @@id([trainerId, locationId])
+}
+model RewardGrant {
+  trainerId String @db.Uuid
+  trainer   Trainer @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  key       String
+  grantedAt DateTime @default(now())
+
+  @@id([trainerId, key])
 }

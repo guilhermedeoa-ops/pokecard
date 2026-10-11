@@ -7,5 +7,6 @@ import { MailService } from "./mail.service";
   imports: [DatabaseModule],
   providers: [AuthService, MailService],
   controllers: [AuthController, TrainerController],
+  exports: [AuthService],
 })
 export class AuthModule {}

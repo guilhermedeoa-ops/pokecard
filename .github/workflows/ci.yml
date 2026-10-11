@@ -2,7 +2,7 @@ name: Foundation checks
 on:
   pull_request:
   push:
-    branches: [main, codex/initial-foundation]
+    branches: [main, codex/initial-foundation, codex/chapter-1-pallet-town]
 permissions:
   contents: read
 jobs:
@@ -41,4 +41,5 @@ jobs:
       - run: npm run db:generate
       - run: npm run db:deploy -w @pokecard/api
       - run: npm run build
+      - run: npm run db:seed -w @pokecard/api
       - run: npm run test:integration
