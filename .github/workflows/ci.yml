@@ -43,3 +43,14 @@ jobs:
       - run: npm run build
       - run: npm run db:seed -w @pokecard/api
       - run: npm run test:integration
+      - run: npx playwright install --with-deps chromium
+        working-directory: apps/web
+      - run: npm run test:e2e -w @pokecard/web
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: chapter-one-browser-report
+          path: |
+            apps/web/playwright-report
+            apps/web/test-results
+          retention-days: 7

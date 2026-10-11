@@ -38,7 +38,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
     try {
       const result = await api<{ message: string }>(paths[mode], data);
       setMessage(result.message);
-      if (mode === "login") window.location.assign("/treinador");
+      if (mode === "login") window.location.assign("/pallet");
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Não foi possível conectar. Tente novamente.");
     } finally { setBusy(false); }

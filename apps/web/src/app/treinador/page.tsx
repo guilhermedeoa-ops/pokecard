@@ -35,13 +35,14 @@ export default function TrainerPage() {
   }
   return <main className="mx-auto max-w-2xl px-6 py-16">
     <Link href="/" className="text-amber-300">← Pokémon Kanto Cards</Link>
+    <Link href="/pallet" className="mt-4 block text-amber-300">Continuar em Pallet Town →</Link>
     <h1 className="my-8 text-4xl font-bold">Seu treinador</h1>
     {profile ? <>
       <section className="rounded-2xl border border-slate-700 bg-slate-900 p-6">
         <p className="text-2xl font-semibold">{profile.trainer.displayName}</p>
         <p className="mt-2 text-slate-300">Usuário: {profile.username}</p>
         <p className="mt-2 text-slate-300">Nível {profile.trainer.level} · {profile.trainer.experience} XP</p>
-        <p className="mt-5 text-slate-400">A visita ao Professor Oak e a escolha do seu primeiro Pokémon chegarão na próxima etapa.</p>
+        <p className="mt-5 text-slate-400">Visite Pallet Town para conversar com o Professor Oak e continuar sua jornada.</p>
       </section>
       <form onSubmit={update} className="mt-8 space-y-4">
         <label className="block">Nome do treinador
