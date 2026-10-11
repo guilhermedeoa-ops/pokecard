@@ -39,3 +39,10 @@ Sem Hunts, combate, captura selvagem, viagens, evolução, Premium, trocas, chat
 Autenticação, throttle de desenvolvimento e outbox mantêm seus limites operacionais documentados. Node/Docker no PC continuam não verificados devido à falha do sandbox.
 Sem dados apagados. Rollback das tabelas de jogo deve ser planejado com backup após uso; não há down migration destrutiva automática.
 Lockfile e hosting permanecem pendências antes da release; assets finais ainda precisam substituir os placeholders.
+
+## Resultado verificado
+Migrações, seed, build, testes de integração e quatro testes Playwright passaram na execução 38136884084 (commit a5714d226ca61802d1649d2f32130c9bad3a9c35). Folhas de contato de desktop e mobile foram inspecionadas e estão em docs/previews. A entrega ainda está em PR, sem merge nem deploy.
+
+![Desktop](previews/chapter-1-desktop.webp)
+
+![Mobile](previews/chapter-1-mobile.webp)
