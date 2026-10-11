@@ -2,7 +2,7 @@ import { BadRequestException, ConflictException, Injectable } from "@nestjs/comm
 import { Prisma } from "@prisma/client";
 import { PrismaService } from "../database/prisma.service";
 import { AuthService } from "../auth/auth.service";
-import { oakMessages, packSpecies, PackId, starterStats, Stats } from "./content";
+import { oakMessages, packSpecies, PackId, starterStats, Stats, zeroStats } from "./content";
 import { EventDto } from "./dto";
 
 @Injectable()
@@ -74,6 +74,7 @@ export class JourneyService {
       const card = await tx.pokemonInstance.create({ data: {
         ownerId: id, originalTrainerId: id, originalTrainerName: trainer.displayName,
         speciesId: packSpecies[packId], stats, hpCurrent: stats.hp,
+        origin: "STARTER_PACK", ivs: zeroStats(), evs: zeroStats(), nature: "HARDY", activeAbility: pack.species.abilities[0] ?? null,
         abilities: pack.species.abilities, moves: pack.species.moves, capturedAt,
         history: [{ event: "STARTER_GIFT", at: capturedAt.toISOString(), trainerId: id, trainerName: trainer.displayName, location: "Pallet Town", ball: "POKE_BALL" }],
       } });

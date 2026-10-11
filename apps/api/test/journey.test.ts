@@ -5,7 +5,7 @@ import { randomUUID, createHash } from "node:crypto";
 import { createApp } from "../src/create-app";
 import { PrismaService } from "../src/database/prisma.service";
 import { MailService } from "../src/auth/mail.service";
-import { starterStats } from "../src/journey/content";
+import { starterStats, calculateStats, zeroStats } from "../src/journey/content";
 
 test("three deterministic starters, atomic rewards, resumable tutorial and authorization", async () => {
   assert.ok(process.env.DATABASE_URL?.includes("/pokecard_test"));
@@ -46,6 +46,9 @@ test("three deterministic starters, atomic rewards, resumable tutorial and autho
       const card = await db.pokemonInstance.findFirstOrThrow({where:{ownerId:id},include:{species:true}});
       assert.equal(card.speciesId,speciesId); assert.equal(card.level,5); assert.equal(card.originBall,"POKE_BALL");
       assert.equal(card.originalTrainerName,key);
+      assert.equal(card.origin,"STARTER_PACK"); assert.equal(card.nature,"HARDY");
+      assert.deepEqual(card.ivs,zeroStats()); assert.deepEqual(card.evs,zeroStats());
+      assert.equal(card.activeAbility,card.species.abilities[0] ?? null);
       assert.equal((await request(cookie,"").then(r=>r.json())).phase,"REVEAL");
       const different = packId==="fire"?"water":"fire";
       assert.equal((await request(cookie,"/starter",{packId:different})).status,409);
@@ -84,4 +87,17 @@ test("three deterministic starters, atomic rewards, resumable tutorial and autho
     await db.pokemonInstance.deleteMany({where:{originalTrainerId:{in:trainers}}});
     await db.user.deleteMany({where:{id:{in:users}}}); await app.close();
   }
+});
+
+test("card stat calculation validates IV, EV, level and nature",()=>{
+ const base={hp:45,attack:49,defense:49,specialAttack:65,specialDefense:65,speed:45};
+ assert.deepEqual(calculateStats(base,5,zeroStats(),zeroStats(),"HARDY"),starterStats(base));
+ const iv={hp:31,attack:31,defense:31,specialAttack:31,specialDefense:31,speed:31};
+ const neutral=calculateStats(base,50,iv,zeroStats(),"HARDY");
+ const adamant=calculateStats(base,50,iv,zeroStats(),"ADAMANT");
+ assert.ok(adamant.attack>neutral.attack);assert.ok(adamant.specialAttack<neutral.specialAttack);
+ assert.throws(()=>calculateStats(base,0,iv,zeroStats()));
+ assert.throws(()=>calculateStats(base,50,{...iv,hp:32},zeroStats()));
+ assert.throws(()=>calculateStats(base,50,iv,{...zeroStats(),hp:253}));
+ assert.throws(()=>calculateStats(base,50,iv,zeroStats(),"UNKNOWN"));
 });

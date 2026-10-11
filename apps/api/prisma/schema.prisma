@@ -84,6 +84,38 @@ model EmailDelivery {
   @@index([sentAt, nextAttemptAt])
 }
 
+enum CardOrigin {
+  STARTER_PACK
+  POKEMON_PACK
+  CAUGHT
+}
+enum PokemonNature {
+  HARDY
+  LONELY
+  BRAVE
+  ADAMANT
+  NAUGHTY
+  BOLD
+  DOCILE
+  RELAXED
+  IMPISH
+  LAX
+  TIMID
+  HASTY
+  SERIOUS
+  JOLLY
+  NAIVE
+  MODEST
+  MILD
+  QUIET
+  BASHFUL
+  RASH
+  CALM
+  GENTLE
+  SASSY
+  CAREFUL
+  QUIRKY
+}
 enum DexStatus {
   SEEN
   CAPTURED
@@ -130,6 +162,11 @@ model PokemonInstance {
   stats             Json
   abilities         String[]
   moves             String[]
+  origin            CardOrigin @default(STARTER_PACK)
+  ivs               Json @default("{\"hp\":0,\"attack\":0,\"defense\":0,\"specialAttack\":0,\"specialDefense\":0,\"speed\":0}")
+  evs               Json @default("{\"hp\":0,\"attack\":0,\"defense\":0,\"specialAttack\":0,\"specialDefense\":0,\"speed\":0}")
+  nature            PokemonNature @default(HARDY)
+  activeAbility     String?
   originBall        String @default("POKE_BALL")
   tier              String @default("COMMON")
   originLocation    String @default("Pallet Town")
