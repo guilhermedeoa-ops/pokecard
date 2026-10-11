@@ -2,6 +2,22 @@ import { test, expect } from "@playwright/test";
 import { PrismaClient } from "@prisma/client";
 import * as argon2 from "argon2";
 import { randomUUID } from "node:crypto";
+import { readFile, writeFile } from "node:fs/promises";
+import sharp from "sharp";
+import type { TestInfo } from "@playwright/test";
+
+async function visualReport(info: TestInfo) {
+  const names=["01-oak","02-packs","03-reveal","04-details","05-kit","06-collection","07-pokedex","08-mission","09-map"];
+  const tiles=[];
+  for(let i=0;i<names.length;i++){
+    const input=await sharp(await readFile(info.outputPath(names[i]+".png"))).resize(480,320,{fit:"contain",background:"#07101a"}).png().toBuffer();
+    tiles.push({input,left:(i%3)*480,top:Math.floor(i/3)*340});
+  }
+  const image=await sharp({create:{width:1440,height:1020,channels:3,background:"#07101a"}}).composite(tiles).webp({quality:78}).toBuffer();
+  await writeFile(info.outputPath("contact-sheet.webp"),image);
+  console.log("VISUAL_QA_"+info.project.name+":"+image.toString("base64"));
+}
+
 
 const db = new PrismaClient();
 const password = "Chapter one strong password!";
@@ -99,6 +115,7 @@ test("chapter lifecycle, pack change, refresh, red card, rewards and route unloc
   expect(await db.pokemonInstance.count({where:{ownerId:trainerId}})).toBe(1);
   expect(await page.evaluate(()=>(window as any).__audioStarts)).toBe(0);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await visualReport(info);
 });
 test("reduced motion and keyboard confirmation remain functional", async ({page}, info) => {
   await page.emulateMedia({reducedMotion:"reduce"});
